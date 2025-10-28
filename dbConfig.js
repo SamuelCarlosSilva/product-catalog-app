@@ -14,7 +14,7 @@ const config = {
         encrypt: false,
         database: process.env.DATABASE
     },
-    port:  process.env.DATABASE_PORT
+    port: 49858
 }
 
 module.exports = config;
