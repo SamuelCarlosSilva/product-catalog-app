@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Catálogo de Produtos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste do Catálogo de Produtos</h1>
+    
+    <div class="test-section">
+        <h2>📋 Instruções de Teste</h2>
+        <p>Este arquivo ajuda a testar se a aplicação está funcionando corretamente.</p>
+        
+        <div class="status warning">
+            <strong>⚠️ Importante:</strong> Certifique-se de que a API está rodando na porta 8090 antes de testar as páginas.
+        </div>
+        
+        <h3>Para iniciar a API:</h3>
+        <pre><code>npm start</code></pre>
+        
+        <h3>Para testar a API:</h3>
+        <pre><code>curl http://localhost:8090/api/products</code></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Páginas da Aplicação</h2>
+        
+        <a href="index.html" class="btn">🏠 Página Home</a>
+        <a href="detail.html?id=1" class="btn">🔍 Página de Detalhes (ID: 1)</a>
+        
+        <h3>Funcionalidades para testar:</h3>
+        <ul>
+            <li>✅ Carregamento da lista de produtos</li>
+            <li>✅ Navegação entre páginas</li>
+            <li>✅ Adicionar novo produto</li>
+            <li>✅ Editar produto existente</li>
+            <li>✅ Excluir produto com confirmação</li>
+            <li>✅ Carousel na seção destaque</li>
+            <li>✅ Responsividade em diferentes telas</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Teste de Conectividade da API</h2>
+        <button class="btn" onclick="testAPI()">Testar Conexão com API</button>
+        <div id="apiStatus"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Dados de Exemplo</h2>
+        <p>Se não houver produtos cadastrados, você pode usar estes dados de exemplo:</p>
+        
+        <h3>Produto de Exemplo:</h3>
+        <pre><code>{
+  "name": "Smartphone XYZ",
+  "price": "1299.99",
+  "quantity": "50",
+  "description": "Smartphone com tela de 6.5 polegadas, câmera de 48MP e bateria de longa duração.",
+  "rating": "4.5",
+  "category": "Eletrônicos"
+}</code></pre>
+        
+        <h3>Para adicionar via API:</h3>
+        <pre><code>curl -X POST http://localhost:8090/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Smartphone XYZ","price":"1299.99","quantity":"50","description":"Smartphone com tela de 6.5 polegadas","rating":"4.5","category":"Eletrônicos"}'</code></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>🐛 Solução de Problemas</h2>
+        
+        <h3>Problema: Página não carrega produtos</h3>
+        <ul>
+            <li>Verifique se a API está rodando: <code>http://localhost:8090/api/products</code></li>
+            <li>Abra o console do navegador (F12) e verifique erros</li>
+            <li>Confirme se não há bloqueios de CORS</li>
+        </ul>
+        
+        <h3>Problema: Modais não abrem</h3>
+        <ul>
+            <li>Verifique se o JavaScript está carregado</li>
+            <li>Confirme se não há erros no console</li>
+            <li>Teste em diferentes navegadores</li>
+        </ul>
+        
+        <h3>Problema: Formulários não enviam</h3>
+        <ul>
+            <li>Verifique se todos os campos obrigatórios estão preenchidos</li>
+            <li>Confirme se a API está respondendo</li>
+            <li>Verifique os logs da API no terminal</li>
+        </ul>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const statusDiv = document.getElementById('apiStatus');
+            statusDiv.innerHTML = '<div class="status warning">Testando conexão...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8090/api/products');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ API conectada com sucesso!<br>
+                            Produtos encontrados: ${data.length}
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="status error">
+                            ❌ Erro na API: ${response.status} ${response.statusText}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ Erro de conexão: ${error.message}<br>
+                        Verifique se a API está rodando na porta 8090
+                    </div>
+                `;
+            }
+        }
+        
+        // Teste automático ao carregar a página
+        window.addEventListener('load', function() {
+            setTimeout(testAPI, 1000);
+        });
+    </script>
+</body>
+</html>
