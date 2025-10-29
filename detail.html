@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">LOGOTIPO</a></h1>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link">LINK 1</a>
+                <a href="#" class="nav-link">LINK 2</a>
+                <a href="#" class="nav-link">LINK 3</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+        <div class="container">
+            <div class="product-detail" id="productDetail">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="credits">
+                <div class="credits-section">
+                    <h3>Sobre</h3>
+                    <p>Este é um catálogo de produtos desenvolvido para fins acadêmicos.</p>
+                    <p>O sistema permite gerenciar produtos de forma dinâmica.</p>
+                    <p>Desenvolvido com tecnologias modernas.</p>
+                </div>
+                <div class="credits-section">
+                    <h3>Autoria</h3>
+                    <div class="author-info">
+                        <div class="user-icon">👤</div>
+                        <div class="author-details">
+                            <p><strong>Aluno:</strong> Fulano de Tal</p>
+                            <p><strong>Curso:</strong> Engenharia de Software</p>
+                            <p><strong>Turma:</strong> Manhã</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="credits-section">
+                    <h3>Redes Sociais:</h3>
+                    <div class="social-icons">
+                        <span class="social-icon">f</span>
+                        <span class="social-icon">🐦</span>
+                        <span class="social-icon">📷</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal para Editar Produto -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Produto</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editProductForm" class="modal-body">
+                <div class="form-group">
+                    <label for="editName">Nome do Produto:</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPrice">Preço:</label>
+                    <input type="number" id="editPrice" name="price" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="editQuantity">Quantidade:</label>
+                    <input type="number" id="editQuantity" name="quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Descrição:</label>
+                    <textarea id="editDescription" name="description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editRating">Avaliação:</label>
+                    <input type="number" id="editRating" name="rating" min="1" max="5" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Categoria:</label>
+                    <input type="text" id="editCategory" name="category" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Exclusão</h2>
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este produto?</p>
+                <p class="warning-text">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
