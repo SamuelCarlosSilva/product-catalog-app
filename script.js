@@ -1,12 +1,9 @@
-// Configuração da API
 const API_BASE_URL = 'http://localhost:8090/api';
 
-// Variáveis globais
 let currentProductId = null;
 let currentSlide = 1;
 let totalSlides = 3;
 
-// Função para fazer requisições à API
 async function apiRequest(endpoint, options = {}) {
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -17,26 +14,21 @@ async function apiRequest(endpoint, options = {}) {
             ...options
         });
 
-        // Check if response has content before parsing as JSON
         const contentType = response.headers.get('content-type');
         const text = await response.text();
         
-        // Handle 404 responses gracefully (return null instead of throwing)
         if (response.status === 404) {
             return null;
         }
         
-        // Handle other error statuses
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
         }
         
-        // If response is empty, return null or empty object
         if (!text || text.trim() === '') {
             return null;
         }
         
-        // Only parse as JSON if content-type indicates JSON
         if (contentType && contentType.includes('application/json')) {
             try {
                 return JSON.parse(text);
@@ -48,7 +40,6 @@ async function apiRequest(endpoint, options = {}) {
         
         return text;
     } catch (error) {
-        // Don't show alert for 404 errors (handled above)
         if (!error.message.includes('404')) {
             console.error('Erro na requisição:', error);
             alert('Erro ao conectar com a API. Verifique se o servidor está rodando.');
@@ -57,18 +48,15 @@ async function apiRequest(endpoint, options = {}) {
     }
 }
 
-// Função para carregar produtos na página inicial
 async function loadProducts() {
     try {
         const products = await apiRequest('/products');
         
-        // Debug: Log first product structure to see field names
         if (products && products.length > 0) {
             console.log('Sample product structure:', products[0]);
             console.log('Product ID field:', products[0].ID, products[0].id, products[0].Id);
         }
         
-        // Pegar apenas os últimos 12 produtos
         const lastProducts = products.slice(-12).reverse();
         
         const productsGrid = document.getElementById('productsGrid');
@@ -94,12 +82,10 @@ async function loadProducts() {
     }
 }
 
-// Helper function to get product ID (handles both ID and id)
 function getProductId(product) {
     return product.ID || product.id || product.Id || null;
 }
 
-// Função para criar um card de produto
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -126,12 +112,10 @@ function createProductCard(product) {
     return card;
 }
 
-// Função para navegar para a página de detalhes
 function goToProductDetail(productId) {
     window.location.href = `detail.html?id=${productId}`;
 }
 
-// Função para carregar detalhes do produto
 async function loadProductDetail() {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
@@ -157,7 +141,6 @@ async function loadProductDetail() {
     }
 }
 
-// Função para exibir detalhes do produto
 function displayProductDetail(product) {
     const productDetail = document.getElementById('productDetail');
     
@@ -199,7 +182,6 @@ function displayProductDetail(product) {
     `;
 }
 
-// Funções do carousel
 function changeSlide(direction) {
     currentSlide += direction;
     
@@ -224,7 +206,6 @@ function updateCarousel() {
     });
 }
 
-// Funções dos modais - Adicionar Produto
 function openAddModal() {
     document.getElementById('addModal').style.display = 'block';
     document.getElementById('addProductForm').reset();
@@ -234,11 +215,9 @@ function closeAddModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
-// Funções dos modais - Editar Produto
 function openEditModal() {
     if (!currentProductId) return;
     
-    // Carregar dados do produto atual
     loadProductForEdit();
     document.getElementById('editModal').style.display = 'block';
 }
@@ -263,7 +242,6 @@ async function loadProductForEdit() {
     }
 }
 
-// Funções dos modais - Excluir Produto
 function openDeleteModal() {
     document.getElementById('deleteModal').style.display = 'block';
 }
@@ -288,9 +266,7 @@ async function confirmDelete() {
     }
 }
 
-// Event listeners para formulários
 document.addEventListener('DOMContentLoaded', function() {
-    // Formulário de adicionar produto
     const addForm = document.getElementById('addProductForm');
     if (addForm) {
         addForm.addEventListener('submit', async function(e) {
@@ -314,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 alert('Produto adicionado com sucesso!');
                 closeAddModal();
-                loadProducts(); // Recarregar lista de produtos
+                loadProducts();
             } catch (error) {
                 console.error('Erro ao adicionar produto:', error);
                 alert('Erro ao adicionar produto.');
@@ -322,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Formulário de editar produto
     const editForm = document.getElementById('editProductForm');
     if (editForm) {
         editForm.addEventListener('submit', async function(e) {
@@ -346,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 alert('Produto atualizado com sucesso!');
                 closeEditModal();
-                loadProductDetail(); // Recarregar detalhes do produto
+                loadProductDetail();
             } catch (error) {
                 console.error('Erro ao atualizar produto:', error);
                 alert('Erro ao atualizar produto.');
@@ -354,7 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Fechar modais ao clicar fora
     window.addEventListener('click', function(event) {
         const modals = document.querySelectorAll('.modal');
         modals.forEach(modal => {
@@ -364,7 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Carregar conteúdo baseado na página atual
     if (window.location.pathname.includes('detail.html')) {
         loadProductDetail();
     } else {
@@ -372,12 +345,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Função para mostrar loading
 function showLoading(element) {
     element.innerHTML = '<div class="loading">Carregando...</div>';
 }
 
-// Função para mostrar erro
 function showError(element, message) {
     element.innerHTML = `<div class="error">${message}</div>`;
 }
