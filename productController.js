@@ -14,6 +14,7 @@ async function addProduct(product){
         .input('Category', sql.NVarChar, product.category)
         .query(`INSERT INTO [dbo].[Products]
         (Name, Price, Quantity, Description, Rating, Category)
+        OUTPUT INSERTED.*
         VALUES (
         @Name, @Price, @Quantity, @Description, @Rating, @Category
         )
@@ -22,6 +23,7 @@ async function addProduct(product){
         return products.recordset;
     } catch (error) {
         console.log(error)
+        throw error;
     }
 }
 
@@ -38,12 +40,19 @@ async function getProducts(){
 async function getProduct(id){
     try {
         let pool = await sql.connect(config);
+        // Convert id to integer if it's a string
+        const productId = parseInt(id, 10);
+        if (isNaN(productId)) {
+            console.error('Invalid product ID:', id);
+            return [];
+        }
+        
         let products = await pool.request()
-            .input('input_parameter', sql.Int, id)
+            .input('input_parameter', sql.Int, productId)
             .query(`SELECT * FROM [dbo].[Products] WHERE ID = @input_parameter`);
         return products.recordset;
     } catch (error) {
-        console.log(error);
+        console.error('Error in getProduct:', error);
         return [];
     }
 }

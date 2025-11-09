@@ -17,14 +17,42 @@ async function apiRequest(endpoint, options = {}) {
             ...options
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Check if response has content before parsing as JSON
+        const contentType = response.headers.get('content-type');
+        const text = await response.text();
+        
+        // Handle 404 responses gracefully (return null instead of throwing)
+        if (response.status === 404) {
+            return null;
         }
-
-        return await response.json();
+        
+        // Handle other error statuses
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+        }
+        
+        // If response is empty, return null or empty object
+        if (!text || text.trim() === '') {
+            return null;
+        }
+        
+        // Only parse as JSON if content-type indicates JSON
+        if (contentType && contentType.includes('application/json')) {
+            try {
+                return JSON.parse(text);
+            } catch (parseError) {
+                console.error('Failed to parse JSON response:', text);
+                throw new Error('Invalid JSON response from server');
+            }
+        }
+        
+        return text;
     } catch (error) {
-        console.error('Erro na requisição:', error);
-        alert('Erro ao conectar com a API. Verifique se o servidor está rodando.');
+        // Don't show alert for 404 errors (handled above)
+        if (!error.message.includes('404')) {
+            console.error('Erro na requisição:', error);
+            alert('Erro ao conectar com a API. Verifique se o servidor está rodando.');
+        }
         throw error;
     }
 }
@@ -33,6 +61,12 @@ async function apiRequest(endpoint, options = {}) {
 async function loadProducts() {
     try {
         const products = await apiRequest('/products');
+        
+        // Debug: Log first product structure to see field names
+        if (products && products.length > 0) {
+            console.log('Sample product structure:', products[0]);
+            console.log('Product ID field:', products[0].ID, products[0].id, products[0].Id);
+        }
         
         // Pegar apenas os últimos 12 produtos
         const lastProducts = products.slice(-12).reverse();
@@ -49,27 +83,43 @@ async function loadProducts() {
 
         lastProducts.forEach(product => {
             const productCard = createProductCard(product);
-            productsGrid.appendChild(productCard);
+            if (productCard) {
+                productsGrid.appendChild(productCard);
+            } else {
+                console.warn('Skipping product with undefined ID:', product);
+            }
         });
     } catch (error) {
         console.error('Erro ao carregar produtos:', error);
     }
 }
 
+// Helper function to get product ID (handles both ID and id)
+function getProductId(product) {
+    return product.ID || product.id || product.Id || null;
+}
+
 // Função para criar um card de produto
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
-    card.onclick = () => goToProductDetail(product.ID);
+    const productId = getProductId(product);
+    
+    if (!productId) {
+        console.error('Product ID is undefined. Product object:', product);
+        return null;
+    }
+    
+    card.onclick = () => goToProductDetail(productId);
 
     card.innerHTML = `
         <div class="product-image">
             🏔️
         </div>
         <div class="product-info">
-            <div class="product-title">${product.Name || 'Nome não informado'}</div>
-            <div class="product-price">R$ ${parseFloat(product.Price || 0).toFixed(2)}</div>
-            <div class="product-description">${product.Description || 'Sem descrição'}</div>
+            <div class="product-title">${product.Name || product.name || 'Nome não informado'}</div>
+            <div class="product-price">R$ ${parseFloat(product.Price || product.price || 0).toFixed(2)}</div>
+            <div class="product-description">${product.Description || product.description || 'Sem descrição'}</div>
         </div>
     `;
 
@@ -119,27 +169,27 @@ function displayProductDetail(product) {
             <h2>Descrição</h2>
             <div class="detail-item">
                 <div class="detail-label">Nome:</div>
-                <div class="detail-value">${product.Name || 'Não informado'}</div>
+                <div class="detail-value">${product.Name || product.name || 'Não informado'}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Preço:</div>
-                <div class="detail-value">R$ ${parseFloat(product.Price || 0).toFixed(2)}</div>
+                <div class="detail-value">R$ ${parseFloat(product.Price || product.price || 0).toFixed(2)}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Quantidade:</div>
-                <div class="detail-value">${product.Quantity || 'Não informado'}</div>
+                <div class="detail-value">${product.Quantity || product.quantity || 'Não informado'}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Descrição:</div>
-                <div class="detail-value">${product.Description || 'Não informado'}</div>
+                <div class="detail-value">${product.Description || product.description || 'Não informado'}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Avaliação:</div>
-                <div class="detail-value">${product.Rating || 'Não informado'}/5</div>
+                <div class="detail-value">${product.Rating || product.rating || 'Não informado'}/5</div>
             </div>
             <div class="detail-item">
                 <div class="detail-label">Categoria:</div>
-                <div class="detail-value">${product.Category || 'Não informado'}</div>
+                <div class="detail-value">${product.Category || product.category || 'Não informado'}</div>
             </div>
             <div class="product-actions">
                 <button class="btn btn-primary" onclick="openEditModal()">Editar Produto</button>
@@ -201,12 +251,12 @@ async function loadProductForEdit() {
     try {
         const product = await apiRequest(`/products/${currentProductId}`);
         
-        document.getElementById('editName').value = product.Name || '';
-        document.getElementById('editPrice').value = product.Price || '';
-        document.getElementById('editQuantity').value = product.Quantity || '';
-        document.getElementById('editDescription').value = product.Description || '';
-        document.getElementById('editRating').value = product.Rating || '';
-        document.getElementById('editCategory').value = product.Category || '';
+        document.getElementById('editName').value = product.Name || product.name || '';
+        document.getElementById('editPrice').value = product.Price || product.price || '';
+        document.getElementById('editQuantity').value = product.Quantity || product.quantity || '';
+        document.getElementById('editDescription').value = product.Description || product.description || '';
+        document.getElementById('editRating').value = product.Rating || product.rating || '';
+        document.getElementById('editCategory').value = product.Category || product.category || '';
     } catch (error) {
         console.error('Erro ao carregar produto para edição:', error);
         alert('Erro ao carregar dados do produto.');

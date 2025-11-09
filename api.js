@@ -24,7 +24,8 @@ router.route('/products').post((request, response) => {
     productController.addProduct(product).then(product => {
         response.json(product)
     }).catch(error => {
-        response.status(500).send(error)
+        console.error('Error adding product:', error);
+        response.status(500).json({ error: error.message || 'Internal server error' })
     })
 })
 
